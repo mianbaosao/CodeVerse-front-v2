@@ -172,10 +172,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, nextTick, watch } from 'vue'
+import { ref, onMounted, nextTick, watch } from '@vue/runtime-core'
 
-interface ChatMessage {
-  role: 'user' | 'assistant' | 'system'
+interface Message {
+  role: string
   content: string
 }
 
@@ -188,7 +188,7 @@ interface Model {
 interface ChatHistory {
   title: string
   date: string
-  messages?: ChatMessage[]
+  messages?: Message[]
 }
 
 // 模型配置
@@ -207,7 +207,7 @@ const quickPrompts: string[] = [
 
 const my_key = "sk-T6c5Bwnz67laZdm68f4411Ed73F942438fF9Bf543b34C933"
 const prompt = ref<string>("")
-const chatMessages = ref<ChatMessage[]>([])
+const chatMessages = ref<Message[]>([])
 const loading = ref<boolean>(false)
 const error = ref<string>("")
 const chatContainer = ref<HTMLElement | null>(null)
@@ -266,7 +266,6 @@ const generateText = async () => {
       content: prompt.value
     })
 
-    const userInput = prompt.value
     prompt.value = ""
     await scrollToBottom()
 
@@ -278,13 +277,10 @@ const generateText = async () => {
       },
       body: JSON.stringify({
         model: selectedModel.value.id,
-        messages: [
-          { role: "system", content: "You are a helpful assistant." },
-          ...chatMessages.value.map(msg => ({
-            role: msg.role,
-            content: msg.content
-          }))
-        ],
+        messages: chatMessages.value.map((msg: Message) => ({
+          role: msg.role,
+          content: msg.content
+        })),
         temperature: Number(temperature.value),
         max_tokens: Number(maxTokens.value)
       })

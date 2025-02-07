@@ -329,8 +329,9 @@ const menuItems: MenuItem[] = [
   { name: '题库', path: '/problems', icon: 'fas fa-code' },
   { name: '学习路线', path: '/learn', icon: 'fas fa-road' },
   { name: '套卷练习', path: '/practice', icon: 'fas fa-book' },
-  { name: '模拟面试', path: '/interview', icon: 'fas fa-comments' },
-  { name: 'GPT', path: '/community', icon: 'fas fa-users' },
+  //{ name: '模拟面试', path: '/interview', icon: 'fas fa-comments' },
+  { name: 'GPT', path: '/gpt', icon: 'fas fa-robot' },  // GPT路由对应GPT.vue
+  { name: '社区', path: '/community', icon: 'fas fa-users' },  // 社区路由对应Community.vue
   { name: '排行榜', path: '/leaderboard', icon: 'fas fa-trophy' }
 ]
 

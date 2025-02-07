@@ -13,6 +13,7 @@ import AddProblem from '@/views/AddProblem.vue'
 import Practice from '@/views/Practice.vue'
 import PracticeDetail from '@/views/PracticeDetail.vue'
 import Interview from '@/views/Interview.vue'
+import GPT from '@/views/GPT.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -58,9 +59,14 @@ const router = createRouter({
       component: Login
     },
     {
-      path: '/community',
+      path: '/gpt',
       name: 'GPT',
-      component: () => import('@/views/GPT.vue')
+      component: GPT
+    },
+    {
+      path: '/community',
+      name: 'Community',
+      component: Community
     },
     {
       path: '/add-problem',
