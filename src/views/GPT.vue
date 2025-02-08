@@ -1,34 +1,43 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
+  <div class="min-h-screen bg-gradient-to-br from-violet-50 via-white to-indigo-50">
     <div class="container mx-auto px-4 py-8">
       <div class="flex space-x-6">
         <!-- 左侧模型选择和设置 -->
-        <div class="w-64 space-y-4">
+        <div class="w-72 space-y-4">
           <!-- 模型选择 -->
-          <div class="bg-white rounded-xl shadow-sm p-4">
-            <h3 class="text-lg font-medium text-gray-800 mb-4">模型选择</h3>
+          <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-sm p-6 border border-indigo-50">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+              <i class="fas fa-robot text-indigo-500 mr-2"></i>
+              模型选择
+            </h3>
             <div class="space-y-2">
               <button
                 v-for="model in models"
                 :key="model.id"
                 @click="selectModel(model)"
-                class="w-full p-3 rounded-lg text-left transition-all relative"
-                :class="selectedModel.id === model.id ? 'bg-indigo-50 text-indigo-700' : 'hover:bg-gray-50 text-gray-600'"
+                class="w-full p-3 rounded-xl text-left transition-all relative overflow-hidden group"
+                :class="selectedModel.id === model.id ? 'bg-indigo-500 text-white' : 'hover:bg-indigo-50 text-gray-600'"
               >
                 <div class="flex items-center space-x-3">
-                  <i :class="model.icon"></i>
-                  <span>{{ model.name }}</span>
+                  <i :class="[model.icon, 'text-lg']"></i>
+                  <span class="font-medium">{{ model.name }}</span>
                 </div>
+                <!-- 选中状态的动画效果 -->
+                <div class="absolute inset-0 bg-gradient-to-r from-indigo-400/20 to-purple-400/20 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></div>
               </button>
             </div>
           </div>
 
           <!-- 对话设置 -->
-          <div class="bg-white rounded-xl shadow-sm p-4">
-            <h3 class="text-lg font-medium text-gray-800 mb-4">对话设置</h3>
+          <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-sm p-6 border border-indigo-50">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+              <i class="fas fa-sliders-h text-indigo-500 mr-2"></i>
+              对话设置
+            </h3>
             <div class="space-y-4">
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
+                <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                  <i class="fas fa-thermometer-half text-orange-400 mr-2"></i>
                   温度 ({{ temperature }})
                 </label>
                 <input
@@ -37,42 +46,54 @@
                   min="0"
                   max="2"
                   step="0.1"
-                  class="w-full"
+                  class="w-full accent-indigo-500"
                 >
               </div>
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
+                <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                  <i class="fas fa-text-height text-green-500 mr-2"></i>
                   最大长度
                 </label>
-                <select v-model="maxTokens" class="w-full rounded-lg border-gray-300">
-                  <option value="1000">1000 tokens</option>
-                  <option value="2000">2000 tokens</option>
-                  <option value="4000">4000 tokens</option>
+                <select v-model="maxTokens" class="w-full rounded-lg border-gray-200 focus:ring-2 focus:ring-indigo-500">
+                  <option value="1000">1000 tokens 🌱</option>
+                  <option value="2000">2000 tokens 🌿</option>
+                  <option value="4000">4000 tokens 🌳</option>
                 </select>
               </div>
             </div>
           </div>
 
           <!-- 快捷提示语 -->
-          <div class="bg-white rounded-xl shadow-sm p-4">
-            <h3 class="text-lg font-medium text-gray-800 mb-4">快捷提示语</h3>
+          <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-sm p-6 border border-indigo-50">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+              <i class="fas fa-magic text-purple-500 mr-2"></i>
+              快捷提示语
+            </h3>
             <div class="space-y-2">
               <button
                 v-for="(prompt, index) in quickPrompts"
                 :key="index"
-                @click="useQuickPrompt(prompt)"
-                class="w-full p-2 rounded-lg text-left hover:bg-gray-50 transition-colors text-sm text-gray-600"
+                @click="useQuickPrompt(prompt.text)"
+                class="w-full p-3 rounded-xl text-left hover:bg-indigo-50 transition-all text-sm text-gray-600 flex items-center space-x-2 group"
               >
-                {{ prompt }}
+                <i :class="[prompt.icon, 'text-gray-400 group-hover:text-indigo-500 transition-colors']"></i>
+                <span>{{ prompt.text }}</span>
               </button>
             </div>
           </div>
         </div>
 
         <!-- 中间聊天区域 -->
-        <div class="flex-1 bg-white rounded-xl shadow-lg overflow-hidden">
+        <div class="flex-1 bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg overflow-hidden border border-indigo-50">
           <!-- 聊天记录区域 -->
           <div class="h-[600px] overflow-y-auto p-6 space-y-4" ref="chatContainer">
+            <!-- 欢迎消息 -->
+            <div v-if="chatMessages.length === 0" class="text-center text-gray-500 mt-20">
+              <div class="text-6xl mb-4">🤖</div>
+              <div class="text-xl font-medium mb-2">你好！我是 AI 助手</div>
+              <div class="text-sm">有什么我可以帮你的吗？</div>
+            </div>
+
             <div v-for="(message, index) in chatMessages" 
               :key="index"
               :class="[
@@ -81,17 +102,17 @@
               ]"
             >
               <div :class="[
-                'max-w-[80%] rounded-lg p-4 relative group',
+                'max-w-[80%] rounded-2xl p-4 relative group animate-fade-in',
                 message.role === 'user' 
-                  ? 'bg-indigo-500 text-white rounded-br-none'
-                  : 'bg-gray-100 text-gray-800 rounded-bl-none'
+                  ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white'
+                  : 'bg-gray-100 text-gray-800'
               ]">
                 <div class="whitespace-pre-wrap">{{ message.content }}</div>
                 <!-- 消息操作按钮 -->
-                <div class="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <div class="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity flex space-x-1">
                   <button 
                     @click="copyMessage(message.content)"
-                    class="p-1 hover:bg-black/10 rounded"
+                    class="p-1.5 hover:bg-white/20 rounded-lg transition-colors"
                     title="复制"
                   >
                     <i class="fas fa-copy text-xs"></i>
@@ -100,37 +121,44 @@
               </div>
             </div>
 
-            <!-- 加载动画 -->
+            <!-- 加载动画优化 -->
             <div v-if="loading" class="flex justify-start">
-              <div class="bg-gray-100 rounded-lg p-4 flex items-center space-x-2">
-                <div class="w-2 h-2 bg-gray-500 rounded-full animate-bounce"></div>
-                <div class="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
-                <div class="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style="animation-delay: 0.4s"></div>
+              <div class="bg-gray-100 rounded-2xl p-4">
+                <div class="flex items-center space-x-2">
+                  <div class="w-2 h-2 bg-indigo-400 rounded-full animate-bounce"></div>
+                  <div class="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+                  <div class="w-2 h-2 bg-pink-400 rounded-full animate-bounce" style="animation-delay: 0.4s"></div>
+                </div>
               </div>
             </div>
           </div>
 
           <!-- 输入区域 -->
-          <div class="border-t border-gray-200 p-4">
+          <div class="border-t border-gray-100 p-4 bg-white/50">
             <div class="flex space-x-4">
-              <textarea
-                v-model="prompt"
-                rows="3"
-                class="flex-1 resize-none border rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                placeholder="输入你的问题..."
-                @keydown.enter.prevent="generateText"
-              ></textarea>
+              <div class="flex-1 relative">
+                <textarea
+                  v-model="prompt"
+                  rows="3"
+                  class="w-full resize-none border rounded-xl p-4 pr-12 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  placeholder="输入你的问题... 💭"
+                  @keydown.enter.prevent="generateText"
+                ></textarea>
+                <div class="absolute right-3 bottom-3 text-gray-400 text-sm">
+                  <i class="fas fa-keyboard"></i>
+                </div>
+              </div>
               <div class="flex flex-col space-y-2">
                 <button
                   @click="generateText"
                   :disabled="loading || !prompt.trim()"
-                  class="px-6 py-3 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                  class="px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-xl hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 transition-all"
                 >
                   <i class="fas fa-paper-plane"></i>
                 </button>
                 <button
                   @click="clearChat"
-                  class="px-6 py-3 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200"
+                  class="px-6 py-3 bg-gray-100 text-gray-600 rounded-xl hover:bg-gray-200 transform hover:scale-105 transition-all"
                   title="清空对话"
                 >
                   <i class="fas fa-trash"></i>
@@ -141,31 +169,34 @@
         </div>
 
         <!-- 右侧对话历史 -->
-        <div class="w-64 bg-white rounded-xl shadow-sm p-4">
-          <h3 class="text-lg font-medium text-gray-800 mb-4">对话历史</h3>
-          <div class="space-y-2">
-            <div
-              v-for="(chat, index) in chatHistory"
-              :key="index"
-              class="p-3 rounded-lg hover:bg-gray-50 cursor-pointer"
-              @click="loadChat(chat)"
-            >
-              <div class="text-sm font-medium text-gray-700 truncate">
-                {{ chat.title }}
-              </div>
-              <div class="text-xs text-gray-500">
-                {{ chat.date }}
+        <div class="w-72">
+          <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-sm p-6 border border-indigo-50">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+              <i class="fas fa-history text-indigo-500 mr-2"></i>
+              对话历史
+            </h3>
+            <div class="space-y-2">
+              <div
+                v-for="(chat, index) in chatHistory"
+                :key="index"
+                class="p-3 rounded-xl hover:bg-indigo-50 cursor-pointer transition-all group"
+                @click="loadChat(chat)"
+              >
+                <div class="flex items-center space-x-2">
+                  <i class="fas fa-comments text-gray-400 group-hover:text-indigo-500"></i>
+                  <div>
+                    <div class="text-sm font-medium text-gray-700 truncate">
+                      {{ chat.title }}
+                    </div>
+                    <div class="text-xs text-gray-500">
+                      {{ chat.date }}
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-
-      <!-- 错误提示 -->
-      <div v-if="error" 
-        class="max-w-4xl mx-auto mt-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700"
-      >
-        {{ error }}
       </div>
     </div>
   </div>
@@ -198,11 +229,11 @@ const models: Model[] = [
 ]
 
 // 快捷提示语
-const quickPrompts: string[] = [
-  '帮我解释一下这段代码',
-  '这个问题如何优化？',
-  '给我一些建议',
-  '用更简单的方式解释'
+const quickPrompts = [
+  { text: '帮我解释一下这段代码', icon: 'fas fa-code' },
+  { text: '这个问题如何优化？', icon: 'fas fa-lightbulb' },
+  { text: '给我一些建议', icon: 'fas fa-comment-dots' },
+  { text: '用更简单的方式解释', icon: 'fas fa-feather' }
 ]
 
 const my_key = "sk-T6c5Bwnz67laZdm68f4411Ed73F942438fF9Bf543b34C933"
@@ -334,20 +365,20 @@ onMounted(() => {
 /* 保持原有样式并添加新的样式 */
 .overflow-y-auto {
   scrollbar-width: thin;
-  scrollbar-color: #CBD5E0 #EDF2F7;
+  scrollbar-color: #CBD5E0 transparent;
 }
 
 .overflow-y-auto::-webkit-scrollbar {
-  width: 6px;
+  width: 4px;
 }
 
 .overflow-y-auto::-webkit-scrollbar-track {
-  background: #EDF2F7;
+  background: transparent;
 }
 
 .overflow-y-auto::-webkit-scrollbar-thumb {
   background-color: #CBD5E0;
-  border-radius: 3px;
+  border-radius: 2px;
 }
 
 /* 消息动画 */
@@ -374,5 +405,38 @@ onMounted(() => {
 /* 添加过渡效果 */
 .transition-all {
   transition: all 0.3s ease;
+}
+
+/* 添加渐变动画 */
+.bg-gradient-to-r {
+  background-size: 200% 200%;
+  animation: gradient 15s ease infinite;
+}
+
+@keyframes gradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* 添加消息动画 */
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 添加毛玻璃效果 */
+.backdrop-blur-sm {
+  backdrop-filter: blur(8px);
 }
 </style> 

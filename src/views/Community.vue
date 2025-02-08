@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gray-50">
+  <div class="min-h-screen bg-gradient-to-br from-violet-50 via-white to-indigo-50">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <!-- 成功提示优化 -->
       <div v-if="showSuccess" 
@@ -13,10 +13,13 @@
         <!-- 左侧导航和信息区域 -->
         <div class="w-72 flex-shrink-0 space-y-6">
           <!-- 圈子列表 -->
-          <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+          <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-sm border border-indigo-50 overflow-hidden">
             <div class="p-6 border-b border-gray-100">
               <div class="flex justify-between items-center">
-                <h2 class="text-xl font-semibold text-gray-800">圈子列表</h2>
+                <h2 class="text-xl font-semibold text-gray-800 flex items-center">
+                  <i class="fas fa-compass text-indigo-500 mr-2"></i>
+                  圈子列表
+                </h2>
                 <button 
                   @click="showAddCircleModal = true"
                   class="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all duration-200 transform hover:scale-110"
@@ -31,8 +34,8 @@
             <div class="p-4 space-y-3">
               <template v-for="circle in circles" :key="circle.id">
                 <!-- 主圈子 -->
-                <div class="rounded-lg bg-gray-50 p-3">
-                  <div class="font-medium text-gray-800 flex items-center justify-between mb-2">
+                <div class="rounded-xl bg-gray-50/80 p-4 hover:bg-gray-50 transition-colors">
+                  <div class="font-medium text-gray-800 flex items-center justify-between mb-3">
                     <span class="flex items-center">
                       <i class="fas fa-folder-open text-indigo-500 mr-2"></i>
                       {{ circle.circleName }}
@@ -40,19 +43,22 @@
                     <div class="flex items-center space-x-2">
                       <button 
                         @click="showAddSubCircle(circle.id)"
-                        class="p-1.5 text-xs text-gray-500 hover:text-indigo-600 hover:bg-white rounded transition-all"
+                        class="p-1.5 text-xs text-gray-500 hover:text-indigo-600 hover:bg-white rounded-lg transition-all"
+                        title="添加子圈子"
                       >
                         <i class="fas fa-plus-circle"></i>
                       </button>
                       <button 
                         @click.stop="showEditCircle(circle)"
-                        class="p-1.5 text-xs text-gray-500 hover:text-blue-600 hover:bg-white rounded transition-all"
+                        class="p-1.5 text-xs text-gray-500 hover:text-blue-600 hover:bg-white rounded-lg transition-all"
+                        title="编辑圈子"
                       >
                         <i class="fas fa-edit"></i>
                       </button>
                       <button 
                         @click.stop="confirmDeleteCircle(circle.id)"
-                        class="p-1.5 text-xs text-gray-500 hover:text-red-600 hover:bg-white rounded transition-all"
+                        class="p-1.5 text-xs text-gray-500 hover:text-red-600 hover:bg-white rounded-lg transition-all"
+                        title="删除圈子"
                       >
                         <i class="fas fa-trash"></i>
                       </button>
@@ -60,15 +66,15 @@
                   </div>
                   
                   <!-- 子圈子 -->
-                  <div class="space-y-1">
+                  <div class="space-y-2">
                     <div v-for="subCircle in circle.children" 
                       :key="subCircle.id"
-                      class="group flex items-center justify-between p-2 rounded-lg cursor-pointer transition-all hover:bg-white"
+                      class="group flex items-center justify-between p-2 rounded-xl cursor-pointer transition-all hover:bg-white"
                     >
                       <div class="flex items-center flex-1" @click="selectCircle(subCircle.id)">
-                        <div class="w-8 h-8 rounded-lg bg-white shadow-sm p-1 mr-3">
-                          <img v-if="subCircle.icon" :src="subCircle.icon" class="w-full h-full object-cover rounded">
-                          <i v-else class="fas fa-circle text-gray-400"></i>
+                        <div class="w-8 h-8 rounded-lg bg-white shadow-sm p-1 mr-3 flex items-center justify-center">
+                          <i v-if="!subCircle.icon" class="fas fa-hashtag text-indigo-400"></i>
+                          <img v-else :src="subCircle.icon" class="w-full h-full object-cover rounded-lg">
                         </div>
                         <span class="text-gray-700 group-hover:text-indigo-600">{{ subCircle.circleName }}</span>
                       </div>
@@ -94,8 +100,11 @@
           </div>
 
           <!-- 圈子信息卡片 -->
-          <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-            <h3 class="text-lg font-semibold text-gray-800 mb-4">圈子信息</h3>
+          <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-sm border border-indigo-50 p-6">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+              <i class="fas fa-chart-pie text-indigo-500 mr-2"></i>
+              圈子信息
+            </h3>
             <div class="space-y-4">
               <div class="flex items-center space-x-3">
                 <div class="w-12 h-12 rounded-lg bg-indigo-50 flex items-center justify-center">
@@ -103,7 +112,7 @@
                 </div>
                 <div>
                   <div class="text-sm text-gray-500">成员数</div>
-                  <div class="text-lg font-medium text-gray-800">{{ memberCount || 0 }}</div>
+                  <div class="text-lg font-medium text-gray-800">{{ memberCount || 0 }} 👥</div>
                 </div>
               </div>
               <div class="flex items-center space-x-3">
@@ -112,23 +121,35 @@
                 </div>
                 <div>
                   <div class="text-sm text-gray-500">今日动态</div>
-                  <div class="text-lg font-medium text-gray-800">{{ todayPosts || 0 }}</div>
+                  <div class="text-lg font-medium text-gray-800">{{ todayPosts || 0 }} 📝</div>
                 </div>
               </div>
             </div>
           </div>
 
           <!-- 热门话题 -->
-          <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-            <h3 class="text-lg font-semibold text-gray-800 mb-4">热门话题</h3>
+          <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-sm border border-indigo-50 p-6">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+              <i class="fas fa-fire text-orange-500 mr-2"></i>
+              热门话题
+            </h3>
             <div class="space-y-3">
               <div v-for="(topic, index) in hotTopics" :key="index" 
-                class="flex items-start space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+                class="flex items-start space-x-3 p-3 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer group"
               >
-                <div class="text-lg font-medium text-gray-400">#{{ index + 1 }}</div>
+                <div class="text-lg font-medium" :class="{
+                  'text-amber-500': index === 0,
+                  'text-gray-400': index !== 0
+                }">
+                  {{ index === 0 ? '🏆' : '#' + (index + 1) }}
+                </div>
                 <div>
-                  <div class="text-gray-800 font-medium">{{ topic.title }}</div>
-                  <div class="text-sm text-gray-500 mt-1">{{ topic.count }}个讨论</div>
+                  <div class="text-gray-800 font-medium group-hover:text-indigo-600 transition-colors">
+                    {{ topic.title }}
+                  </div>
+                  <div class="text-sm text-gray-500 mt-1">
+                    {{ topic.count }} 个讨论 🗣️
+                  </div>
                 </div>
               </div>
             </div>
@@ -138,12 +159,12 @@
         <!-- 中间内容区域 -->
         <div class="flex-1">
           <!-- 发布框优化 -->
-          <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
+          <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-sm border border-indigo-50 p-6 mb-6">
             <textarea
               v-model="newMomentContent"
               rows="3"
               class="w-full px-4 py-3 text-gray-700 border border-gray-200 rounded-xl resize-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
-              placeholder="分享你的想法..."
+              placeholder="分享你的想法... ✨"
             ></textarea>
             
             <!-- 图片上传和发布按钮 -->
@@ -166,9 +187,10 @@
               </div>
               <button
                 @click="publishMoment"
-                class="px-6 py-2.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105"
+                class="px-6 py-2.5 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-lg hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105"
                 :disabled="!newMomentContent.trim() && !momentImages.length"
               >
+                <i class="fas fa-paper-plane mr-2"></i>
                 发布
               </button>
             </div>
@@ -1219,5 +1241,41 @@ onMounted(() => {
 /* 删除按钮动画 */
 .hover\:text-red-600:hover {
   @apply transform scale-110;
+}
+
+/* 添加毛玻璃效果 */
+.backdrop-blur-sm {
+  backdrop-filter: blur(8px);
+}
+
+/* 添加渐变动画 */
+.bg-gradient-to-r {
+  background-size: 200% 200%;
+  animation: gradient 15s ease infinite;
+}
+
+@keyframes gradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* 优化滚动条 */
+.overflow-y-auto {
+  scrollbar-width: thin;
+  scrollbar-color: #CBD5E0 transparent;
+}
+
+.overflow-y-auto::-webkit-scrollbar {
+  width: 4px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb {
+  background-color: #CBD5E0;
+  border-radius: 2px;
 }
 </style> 
